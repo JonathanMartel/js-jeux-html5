@@ -13,8 +13,8 @@
 /**
  * Classe de l'objet GameEngine
  * Classe principal du framework 
+ * Auteur : Jonathan Martel (jonathmartel@gmail.com)
  * 
- *  
  */
 
  //console.log = function(){};
