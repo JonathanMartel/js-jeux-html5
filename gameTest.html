@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Test - jsGameEngine</title>
+<script src="jsGameEngine.js"></script>
+
+<script>
+
+/**
+* Mon image à animer
+* source : http://www.williammalone.com/articles/create-html5-canvas-javascript-game-character/1/
+*/
+
+var imagesPerso = {};
+/*loadImage(imagesPerso, "leftArm", 40 , -42, 0, 0, 0, 1);
+loadImage(imagesPerso, "legs", 0, 0, 0, 0, 0, 1);
+loadImage(imagesPerso, "torso", 0, -50, 0, 0, 0, 1);
+loadImage(imagesPerso, "rightArm", -15, -42, 0, 0,  0, 1);
+loadImage(imagesPerso, "head", -10, -125, 0, 0, 0, 1);
+loadImage(imagesPerso, "hair", -37, -138, 0, 0, 0, 1);
+*/
+function loadImage(oImage, name, ext, ordre, posX, posY, rotation, rotX, rotY, scale, frame) {
+
+	if(!oImage[name])
+	{
+		oImage[name] = new Image();
+		oImage[name].src = "images/" + name + "."+ext;
+		oImage[name].ordre = (ordre || 1);
+		oImage[name].frame = new Array()
+	}
+	oImage[name].frame[frame] = {};
+	oImage[name].frame[frame].posX = posX;
+	oImage[name].frame[frame].posY = posY;
+	oImage[name].frame[frame].rotation = rotation;
+	oImage[name].frame[frame].rotX = rotX;
+	oImage[name].frame[frame].rotY = rotY;
+	oImage[name].frame[frame].scale = scale;
+	
+}
+
+function dessineAnimMarche()
+{
+	var imageAnimMarche = {};
+	var j;
+	loadImage(imageAnimMarche, "legs", "png",  2,  0, 0, 0, 0, 0, 1, 1);
+	loadImage(imageAnimMarche, "torso", "png", 3, 0, -50, 0, 0, 0, 1, 1);
+		
+	for(var i= 1 ; i<25; i++)
+	{
+		loadImage(imageAnimMarche, "leftArm", "png", 1, 40 , -42, i/2, 13, 13, 1, i);
+		loadImage(imageAnimMarche, "head", "png", 4, -10, (-125+(i/2)), 0, 0, 0, 1, i);
+		loadImage(imageAnimMarche, "hair", "png", 5, -37, (-138+(i/2)), 0, 0, 0, 1, i);
+		loadImage(imageAnimMarche, "rightArm", "png", 6, -15, -42, -i/2, 23, 13, 1, i);
+		j = i;
+	}
+	for(var i = j ; i>0; i--, j++)
+	{
+		loadImage(imageAnimMarche, "leftArm", "png", 1, 40 , -42, (i/2), 13, 13, 1, j);
+		loadImage(imageAnimMarche, "head", "png", 4, -10, (-125+(i/2)), 0, 0, 0, 1, j);
+		loadImage(imageAnimMarche, "hair", "png", 5, -37, (-138+(i/2)), 0, 0, 0, 1, j);
+		loadImage(imageAnimMarche, "rightArm", "png", 6, -15, -42, -i/2, 23, 13, 1, j);
+	}
+	return imageAnimMarche;
+}
+
+var imageAnimMarche = dessineAnimMarche();
+
+//console.log(j);
+
+var imagesBackground = {};
+loadImage(imagesBackground, "background", "jpg", 1, 0 ,-80, 0, 0, 0, 0.4, 1);
+
+
+console.log(imageAnimMarche);
+console.log(imageAnimMarche["leftArm"].frame.length);
+
+
+window.addEventListener('load', init, false);
+function init()
+{
+	var jeux = new GameEngine(30, 'canvas');
+
+	jeux.update.add(function(){},null, null,null ,1);
+	var background = jeux.ajouteObjet('background', 'background', 0, 0, 1, function(){} );
+	
+	var imageBackground = background.ajouteImage('background', 'background', function(){console.log('init image background')}, null, imagesBackground, 0, 0, jeux.context);
+	var perso = jeux.ajouteObjet('perso', 'perso', 30, 145, 1, function(){} )	
+	//var imagePerso = perso.ajouteImage('imagePerso', 'imagePerso', function(){console.log('init image')}, null, imagesPerso, 0, 0, jeux.context);
+	
+	var rigid = perso.ajouteRigidBody('gravite', function(){console.log('init rigidbody')}, function(){});
+	var animation = perso.ajouteAnimation('perso', 'perso', 'animation', function(){console.log('init animation')}, function(){}, imageAnimMarche, jeux.context);
+	animation.arret();
+	var oControleur = {};
+	oControleur['down'] = {
+		'32' : function(){},
+		'37' : function(){perso.posX -= 5; animation.demarre();},
+		'38' : function(){perso.posY -= 5;},
+		'39' : function(){perso.posX += 5; animation.demarre();},
+		'40' : function(){perso.posY += 5;}
+	};
+	oControleur['up'] = {
+		'37' : function(){animation.termine();},
+		'39' : function(){animation.termine();},
+	};
+	
+	
+	perso.ajouteControleur('clavier', null, oControleur);
+	//imagePerso.dessine();
+	jeux.demarre();
+	//animation.demarre();
+
+	//setTimeout(function(){animation.arret();}, 1000);
+	//setInterval(function(){animation.demarre();}, 2000);
+}
+										 
+function fctTest()
+{
+	console.log("fctTest");
+}
+</script>
+
+
+</head>
+
+<body>
+<canvas id="canvas" width="800" height="400"></canvas>
+
+</body>
+</html>
